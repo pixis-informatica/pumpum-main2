@@ -3138,10 +3138,11 @@ function parsePriceARS(str) {
 }
 
 /**
- * Exporta todos los productos a un CSV compatible con Excel.
- * Prefijo sep=;  y formato de moneda $ 1.000,00
+ * Exporta el inventario completo a un archivo Excel (.xlsx)
+ * Los precios se exportan como números puros para que Excel los trate
+ * correctamente y la reimportación no tenga problemas de formato.
  */
-function exportProductsToCSV() {
+function exportProductsToXLSX() {
   let products = window.PixisState?.state?.products || PixisEditor.data.products || [];
   
   // Filtrar productos que tengan excludeFromExport: true
@@ -3152,37 +3153,63 @@ function exportProductsToCSV() {
     return;
   }
 
-  const SEP = ';';
-  const headers = [
-    'ID', 'Producto', 'Precio Transferencia', 'Precio Efectivo'
+  // Preparar datos para SheetJS (Array of Arrays)
+  // Los precios van como NÚMEROS PUROS para que Excel los trate correctamente
+  // y no haya problemas al reimportar.
+  const data = [
+    ['ID', 'Producto', 'Precio Transferencia', 'Precio Efectivo']
   ];
 
-  const rows = products.map(p => [
-    p.id || '',
-    p.title || '',
-    formatPriceARS(p.price),
-    formatPriceARS(p.priceLocal || p.price)
-  ]);
+  products.forEach(p => {
+    data.push([
+      p.id || '',
+      p.title || '',
+      Number(p.price) || 0,
+      Number(p.priceLocal || p.price) || 0
+    ]);
+  });
 
-  const escapeCSV = (val) => {
-    const s = String(val);
-    return (s.includes(SEP) || s.includes('"') || s.includes('\n'))
-      ? '"' + s.replace(/"/g, '""') + '"' : s;
-  };
+  // Crear libro y hoja
+  const worksheet = XLSX.utils.aoa_to_sheet(data);
 
-  const csvContent = 'sep=' + SEP + '\n'
-    + headers.map(escapeCSV).join(SEP) + '\n'
-    + rows.map(row => row.map(escapeCSV).join(SEP)).join('\n');
+  // Aplicar formato de moneda argentina a las columnas de precio (C y D)
+  // IMPORTANTE: Los códigos de formato de Excel siempre usan ',' para miles y '.' para decimal
+  // (sin importar el locale). Excel muestra el resultado según el locale del usuario.
+  // En Argentina: '$ #,##0.00' → muestra '$ 7.000,00'
+  const fmtPrecio = '$ #,##0.00';
+  const totalRows = data.length; // header + productos
+  for (let r = 1; r < totalRows; r++) {
+    // Columna C (índice 2) = Precio Transferencia
+    const cellC = XLSX.utils.encode_cell({ r, c: 2 });
+    if (worksheet[cellC]) worksheet[cellC].z = fmtPrecio;
+    // Columna D (índice 3) = Precio Efectivo
+    const cellD = XLSX.utils.encode_cell({ r, c: 3 });
+    if (worksheet[cellD]) worksheet[cellD].z = fmtPrecio;
+  }
 
-  const bom = '\uFEFF'; // BOM UTF-8 para Excel
-  const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `inventario_pixis_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-  window.PixisOverlay.showToast(`✅ ${products.length} productos exportados a CSV`, 'success');
+  // Ajustar anchos de columna
+  const wscols = [
+    { wch: 30 }, // ID
+    { wch: 60 }, // Producto
+    { wch: 24 }, // Precio Transferencia
+    { wch: 24 }  // Precio Efectivo
+  ];
+  worksheet['!cols'] = wscols;
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Inventario Pixis");
+
+  // Generar y descargar el archivo XLSX
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const fileName = `inventario_pixis_${dateStr}.xlsx`;
+  
+  try {
+    XLSX.writeFile(workbook, fileName);
+    window.PixisOverlay.showToast(`✅ ${products.length} productos exportados a Excel (.xlsx)`, 'success');
+  } catch (err) {
+    console.error('[Export XLSX Error]', err);
+    window.PixisOverlay.showToast('❌ Error al exportar Excel: ' + err.message, 'error');
+  }
 }
 
 /**
@@ -3352,16 +3379,149 @@ function importProductsFromXLSX(file) {
   reader.onload = function(e) {
     try {
       const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
+      // cellDates:false, raw:false → SheetJS devuelve los valores ya convertidos a string
+      // raw:true → devuelve el valor numérico real para celdas numéricas
+      const workbook = XLSX.read(data, { type: 'array', cellDates: false });
       const firstSheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[firstSheetName];
       
-      // Convertimos a CSV usando punto y coma para que sea 100% compatible con importProductsFromCSV
-      const csv = XLSX.utils.sheet_to_csv(worksheet, { FS: ';' });
+      // sheet_to_json devuelve objetos con las claves del header (fila 1)
+      // raw:true preserva los números como JS numbers (sin formateo regional)
+      const rows = XLSX.utils.sheet_to_json(worksheet, { raw: true, defval: '' });
       
-      // Creamos un Blob con el contenido CSV para pasarlo al importador actual
-      const blob = new Blob([csv], { type: 'text/csv' });
-      importProductsFromCSV(blob);
+      if (!rows.length) {
+        window.PixisOverlay.showToast('No se encontraron filas en el archivo.', 'error');
+        return;
+      }
+
+      // Mapeo flexible de columnas (igual que el importador CSV)
+      const aliases = {
+        id:           ['id'],
+        title:        ['título','titulo','nombre','title','producto'],
+        price:        ['precio transferencia','price'],
+        priceLocal:   ['precio efectivo','precio local','pricelocal','cash'],
+        category:     ['categoría','categoria','category'],
+        category2:    ['categoría 2','categoria 2','category2'],
+        category3:    ['categoría 3','categoria 3','category3'],
+        subcategoria: ['subcategoría','subcategoria','sub'],
+        img:          ['imagen','img','image','foto'],
+        desc:         ['descripción','descripcion','desc'],
+        inStock:      ['en stock','stock','instock'],
+        banners:      ['banners','banner']
+      };
+
+      // Construir mapa: clave_real_del_excel → campo_nuestro
+      const firstRow = rows[0];
+      const colMap = {};
+      Object.keys(firstRow).forEach(excelKey => {
+        const keyLower = excelKey.toLowerCase().trim();
+        for (const [field, arr] of Object.entries(aliases)) {
+          if (arr.some(a => keyLower.includes(a))) { colMap[excelKey] = field; break; }
+        }
+      });
+
+      const get = (row, field) => {
+        const excelKey = Object.keys(colMap).find(k => colMap[k] === field);
+        return excelKey !== undefined ? row[excelKey] : undefined;
+      };
+
+      const currentProducts = window.PixisState?.state?.products || PixisEditor.data.products || [];
+      const prodMap = new Map();
+      currentProducts.forEach(p => { if (p.id) prodMap.set(String(p.id), p); });
+
+      const imported = [];
+      let updatedCount = 0;
+      let addedCount = 0;
+
+      rows.forEach((row, idx) => {
+        const id = String(get(row, 'id') || '').trim();
+        const existing = id ? prodMap.get(id) : null;
+        const prod = existing ? { ...existing } : {};
+
+        prod.id = id || `prod-import-${Date.now()}-${idx}`;
+
+        const titleVal = get(row, 'title');
+        if (titleVal !== undefined) prod.title = String(titleVal).trim();
+
+        // Precios: SheetJS devuelve números reales si la celda era número
+        const priceVal = get(row, 'price');
+        if (priceVal !== undefined && priceVal !== '') {
+          const n = typeof priceVal === 'number' ? Math.round(priceVal) : parsePriceARS(String(priceVal));
+          if (n !== '' && !isNaN(n)) prod.price = n;
+        }
+
+        const priceLocalVal = get(row, 'priceLocal');
+        if (priceLocalVal !== undefined && priceLocalVal !== '') {
+          const n = typeof priceLocalVal === 'number' ? Math.round(priceLocalVal) : parsePriceARS(String(priceLocalVal));
+          if (n !== '' && !isNaN(n)) prod.priceLocal = n;
+        } else if (!prod.priceLocal) {
+          prod.priceLocal = prod.price;
+        }
+
+        const catVal = get(row, 'category');
+        if (catVal !== undefined) prod.category = String(catVal).trim();
+        const cat2Val = get(row, 'category2');
+        if (cat2Val !== undefined) prod.category2 = String(cat2Val).trim();
+        const cat3Val = get(row, 'category3');
+        if (cat3Val !== undefined) prod.category3 = String(cat3Val).trim();
+        const subVal = get(row, 'subcategoria');
+        if (subVal !== undefined) prod.subcategoria = String(subVal).trim();
+        const imgVal = get(row, 'img');
+        if (imgVal !== undefined) prod.img = String(imgVal).trim();
+        const descVal = get(row, 'desc');
+        if (descVal !== undefined) prod.desc = String(descVal).trim();
+
+        const stockVal = get(row, 'inStock');
+        if (stockVal !== undefined) {
+          const s = String(stockVal).toLowerCase().trim();
+          prod.inStock = !['no','false','0','sin stock'].includes(s);
+        }
+
+        const banVal = get(row, 'banners');
+        if (banVal !== undefined) {
+          prod.banners = String(banVal) ? String(banVal).split(',').map(b=>b.trim()).filter(Boolean) : [];
+        }
+
+        if (!prod.title) return; // Saltar filas sin nombre
+        imported.push(prod);
+        if (existing) updatedCount++; else addedCount++;
+      });
+
+      if (!imported.length) {
+        window.PixisOverlay.showToast('No se encontraron productos válidos.', 'error');
+        return;
+      }
+
+      if (!confirm(
+        `📦 IMPORTACIÓN INTELIGENTE: ${imported.length} PRODUCTOS\n\n` +
+        `✅ Actualizados: ${updatedCount}\n` +
+        `🆕 Nuevos: ${addedCount}\n\n` +
+        `Los productos que no estén en el Excel serán eliminados del catálogo. Sus imágenes y descripciones se mantendrán intactas.\n¿Continuar?`
+      )) return;
+
+      // PRESERVAR productos excluidos
+      currentProducts.forEach(p => {
+        if (p.excludeFromExport === true && !imported.some(imp => imp.id === p.id)) {
+          imported.push(p);
+        }
+      });
+
+      if (window.PixisState) {
+        window.PixisState.pushHistory();
+        window.PixisState.state.products = imported;
+        window.PixisState.saveState().then(saved => {
+          window.PixisOverlay.showToast(
+            (saved ? `✅ ${imported.length} productos importados desde Excel` : `📥 ${imported.length} importados (sin servidor)`),
+            'success', 5000
+          );
+          window.PixisState.applyStateToDOM();
+        });
+      } else {
+        PixisEditor.data.products = imported;
+        markUnsaved();
+        window.PixisOverlay.showToast(`📥 ${imported.length} productos importados (sin servidor)`, 'info', 5000);
+      }
+
     } catch (err) {
       console.error('[PIXIS XLSX Import]', err);
       window.PixisOverlay.showToast('❌ Error al leer Excel: ' + err.message, 'error', 5000);
@@ -3832,9 +3992,9 @@ function openAdminConfigPanel() {
     setTimeout(() => window.PixisOverlay.closeModal(), 2000);
   });
 
-  // ── Botones de Inventario CSV ──
+  // ── Botones de Inventario (Excel) ──
   document.getElementById('btnExportInventario')?.addEventListener('click', () => {
-    exportProductsToCSV();
+    exportProductsToXLSX();
   });
 
   // ── Botón Mostrar QR 2FA ──
