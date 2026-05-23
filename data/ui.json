@@ -91,14 +91,14 @@
     "body#top > header > div > div > span": {
       "text": "PC, hardware y servicio técnico \n                en Santiago del Estero",
       "style": {
-        "width": "484.891px",
-        "fontSize": "14.5px",
-        "lineHeight": "36.2px",
+        "width": "465.875px",
+        "fontSize": "19.5px",
+        "lineHeight": "24.2px",
         "textAlign": "",
         "display": "inline-block",
-        "transform": "",
-        "position": "",
-        "zIndex": ""
+        "transform": "translate(9px, 2px)",
+        "position": "relative",
+        "zIndex": "100"
       }
     }
   },
