@@ -297,6 +297,9 @@ window.PixisState = {
           try { el = document.querySelector(dataId); } catch(e) {}
         }
         if (el && el.tagName === 'IMG') {
+          // PROTECCIÓN: Si es el logo, no permitir que el JSON lo sobrescriba para evitar bugs
+          if (el.classList.contains('logo')) return;
+
           el.src = window.optimizeImageUrl(val.src || val, el.offsetWidth || 800);
           if (val.alt) el.alt = val.alt;
           if (val.style) Object.assign(el.style, val.style);
