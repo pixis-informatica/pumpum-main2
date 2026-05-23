@@ -341,7 +341,7 @@
     "category2": ""
   },
   {
-    "img": "img\\productos\\hdmi 5M  kelyx 4k.png",
+    "img": "img/productos/cable-kelyx-hdmi-4k-5-metros/hdmi-5m--kelyx-4k-1779557159082.jpg",
     "title": "Cable Kelyx HDMI 4K - 5 metros",
     "desc": "°1080p (Full HD): hasta 60HZ\nCERTIFICACION 1.4",
     "priceVisible": "$7.500",
@@ -355,7 +355,10 @@
     "customButtons": [],
     "banners": [],
     "category": "Cables",
-    "category2": ""
+    "category2": "",
+    "gallery": "img/productos/cable-kelyx-hdmi-4k-5-metros/hdmi-5m--kelyx-4k-1779557159082.jpg,img/productos/cable-kelyx-hdmi-4k-5-metros/cable-kelyx-hdmi-4k-3-metros-01-1779557062572.jpg",
+    "category3": "",
+    "excludeFromExport": false
   },
   {
     "img": "img/productos/Cable sata 3 6gbps.png",
