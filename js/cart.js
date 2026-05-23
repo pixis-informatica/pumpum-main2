@@ -3253,19 +3253,29 @@ window.abrirCategoria = function(targetId) {
 
     // 3. Ocultar todos por defecto
     elementosCatalogo.forEach(el => el.style.display = "none");
-    const seccionDestacados = document.querySelector(".destacados");
 
     // 4. ELIMINADA LÓGICA 'TODAS' SEGÚN PETICIÓN DEL USUARIO
 
     // Si es una categoría en específico
     const catalogoCompleto = document.getElementById("catalogo-completo");
-    const seccionNuevos = document.getElementById("nuevosIngresosSection");
-
+    
     if (catalogoCompleto) catalogoCompleto.style.display = "block";
-    if (seccionDestacados) seccionDestacados.style.display = "none";
-    if (seccionNuevos) seccionNuevos.style.display = "none";
-    if (document.getElementById("reelsSection")) document.getElementById("reelsSection").style.display = "none";
-    if (document.getElementById("aprendeSection")) document.getElementById("aprendeSection").style.display = "none";
+
+    // Ocupamos un barrido total para que no quede nada del inicio
+    const selectoresPortada = [
+      '.hero-container', 
+      '.destacados', 
+      '#nuevosIngresosSection', 
+      '#reelsSection', 
+      '#aprendeSection',
+      '.ofertas-container',
+      '.banner-informativo'
+    ];
+    selectoresPortada.forEach(sel => {
+      document.querySelectorAll(sel).forEach(el => {
+        el.style.setProperty('display', 'none', 'important');
+      });
+    });
 
     // 5. Mostrar solo los elementos correspondientes a la categoria
     const targetH3 = document.getElementById(targetId);
@@ -3351,26 +3361,34 @@ window.goHome = function () {
   const catalogo = document.getElementById("catalogo-completo");
   const destacados = document.querySelector(".destacados");
   const nuevosIngresos = document.getElementById("nuevosIngresosSection");
+  const hero = document.querySelector(".hero-container");
 
   // Limpiar memoria de navegación al volver a inicio a propósito
   sessionStorage.removeItem('pixisAppState');
   window._categoriaActiva = null;
-  actualizarEnlaceActivo();
+  if (typeof actualizarEnlaceActivo === 'function') actualizarEnlaceActivo();
 
   // Ocultar catálogo y resultados
   if (catalogo) catalogo.style.display = "none";
 
-  // Mostrar Portada y Secciones Iniciales
-  if (destacados) destacados.style.display = "block";
-  if (nuevosIngresos) nuevosIngresos.style.display = "block";
-  if (document.getElementById("reelsSection")) document.getElementById("reelsSection").style.display = "block";
-  if (document.getElementById("aprendeSection")) document.getElementById("aprendeSection").style.display = "block";
+  // Mostrar Portada y Secciones Iniciales (Barrido Total)
+  const selectoresPortada = [
+    '.hero-container', 
+    '.destacados', 
+    '#nuevosIngresosSection', 
+    '#reelsSection', 
+    '#aprendeSection',
+    '.ofertas-container',
+    '.banner-informativo'
+  ];
+  selectoresPortada.forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => el.style.display = "block");
+  });
 
 
   // Limpiar Búsqueda preventivamente sin loop
-  // (no se dispara 'input' para evitar que el listener vuelva a programar goHome)
   const searchInp = document.getElementById("searchInput");
-  if (searchInp && searchInp.value !== "") {
+  if (searchInp) {
     searchInp.value = "";
     // Limpiar también la burbuja de búsqueda si existe
     const bubbleInp = document.getElementById("searchBubbleInput");
@@ -3379,7 +3397,7 @@ window.goHome = function () {
     window._filtroBanner   = null;
     window._filtroBannerFn = null;
     window._bannerActualId = null;
-    // Resetear estado de cards y contenedores sin disparar el evento
+    // Resetear estado de cards y contenedores
     document.querySelectorAll('.card').forEach(card => card.classList.remove('oculta', 'filtrando'));
     document.querySelectorAll('.productos').forEach(el => { el.style.display = ''; });
     const noRes = document.getElementById('noResults');
@@ -3390,6 +3408,16 @@ window.goHome = function () {
   // Asegurar que el menú se cierre al volver a inicio
   if (window.closePixisMenu) window.closePixisMenu();
 };
+
+// Asegurar comportamiento SPA del logo mediante listener (inmune a borrado de onclick en HTML)
+document.addEventListener('click', function(e) {
+  const logoLink = e.target.closest('.logo-container');
+  if (logoLink) {
+    e.preventDefault();
+    window.goHome();
+  }
+});
+
 onPixisDOMReady(() => {
   aplicarPrecioEspecial();
 });
@@ -3890,8 +3918,10 @@ window.addEventListener('beforeunload', () => {
 });
 
 onPixisDOMReady(() => {
-  const savedStateStr = sessionStorage.getItem('pixisAppState');
-  if (savedStateStr) {
+  const restaurarEstadoF5 = () => {
+      const savedStateStr = sessionStorage.getItem('pixisAppState');
+      if (!savedStateStr) return;
+
       try {
           const estado = JSON.parse(savedStateStr);
           
@@ -3905,30 +3935,41 @@ onPixisDOMReady(() => {
           } 
           // 2. Restaurar Categoría (solo si no hay búsqueda activa)
           else if (estado.categoriaActiva) {
-              const catLink = document.querySelector(`.categorias-nav a[href="#${estado.categoriaActiva}"]`);
+              const catLink = document.querySelector(`.categorias-nav a[href="#${estado.categoriaActiva}"], a[href="#${estado.categoriaActiva}"]`);
+              
+              const limpiarHomeParaCat = () => {
+                  // Ocultar TODO lo que sea portada de forma agresiva
+                  const selectoresPortada = [
+                    '.hero-container', 
+                    '.destacados', 
+                    '#nuevosIngresosSection', 
+                    '#reelsSection', 
+                    '#aprendeSection',
+                    '.ofertas-container',
+                    '.banner-informativo'
+                  ];
+                  selectoresPortada.forEach(sel => {
+                    document.querySelectorAll(sel).forEach(el => {
+                        el.style.setProperty('display', 'none', 'important');
+                    });
+                  });
+                  
+                  const catalogoCompleto = document.getElementById("catalogo-completo");
+                  if (catalogoCompleto) catalogoCompleto.style.display = "block";
+              };
+
               if (catLink && catLink.offsetParent !== null) {
+                 limpiarHomeParaCat();
                  catLink.click();
               } else {
                  // Si la barra no es visible o falla el click, replicamos la lógica directa
                  window._categoriaActiva = estado.categoriaActiva;
                  if (typeof actualizarEnlaceActivo === 'function') actualizarEnlaceActivo();
                  
-                 const catalogoCompleto = document.getElementById("catalogo-completo");
-                 const destacados = document.querySelector(".destacados");
-                 const nuevosIngresos = document.getElementById("nuevosIngresosSection");
-                 
-                 const reelsSection = document.getElementById("reelsSection");
-                 const aprendeSection = document.getElementById("aprendeSection");
+                 limpiarHomeParaCat();
 
-                 // Ocultar home
-                 if (destacados) destacados.style.display = "none";
-                 if (nuevosIngresos) nuevosIngresos.style.display = "none";
-                 if (reelsSection) reelsSection.style.display = "none";
-                 if (aprendeSection) aprendeSection.style.display = "none";
-                 
-                 // Preparar catalogo
-                 if (catalogoCompleto) catalogoCompleto.style.display = "block";
-                 document.querySelectorAll('.Gabinetes h3.categoria, .Gabinetes .categoria-ui, .Gabinetes .productos, .Gabinetes .separador-categoria').forEach(el => el.style.display = "none");
+                 // Preparar catalogo (ocultar todo y mostrar solo la categoría target)
+                 document.querySelectorAll('#catalogo-completo h3.categoria, #catalogo-completo .categoria-ui, #catalogo-completo .productos, #catalogo-completo .separador-categoria').forEach(el => el.style.display = "none");
                  
                  const targetH3 = document.getElementById(estado.categoriaActiva);
                  if (targetH3) {
@@ -3944,18 +3985,22 @@ onPixisDOMReady(() => {
           
           // 3. Restaurar Scroll
           if (estado.scrollY) {
-              // Pequeño timeout para permitir que el DOM renderice el display: block/none
               setTimeout(() => {
                   window.scrollTo({ top: estado.scrollY, left: 0, behavior: 'instant' });
-              }, 250);
+              }, 400); // Un poco más de tiempo para asegurar estabilidad
           }
           
       } catch(e) {
           console.error("Error restaurando estado de Pixis (F5):", e);
       }
-  }
+  };
 
-  // 4. Soporte para ?producto=slug (Lógica consolidada arriba)
+  // EJECUCIÓN CONDICIONAL: Esperar a que state.js termine si es necesario
+  if (window._productosListos) {
+    restaurarEstadoF5();
+  } else {
+    document.addEventListener('pixis:state-ready', restaurarEstadoF5);
+  }
 });
 
 // (Función movida al inicio para evitar errores de carga)

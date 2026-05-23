@@ -276,6 +276,9 @@ window.PixisState = {
           try { el = document.querySelector(dataId); } catch(e) {}
         }
         if (el) {
+          // PROTECCIÓN TOTAL: Nada dentro del logo debe ser tocado por el JSON (textos o imágenes)
+          if (el.classList.contains('logo') || el.classList.contains('mascota') || el.closest('.logo-container')) return;
+
           if (typeof data === 'object' && data !== null) {
             if (data.text !== undefined) el.textContent = data.text;
             if (data.html !== undefined) el.innerHTML = data.html;
@@ -297,8 +300,8 @@ window.PixisState = {
           try { el = document.querySelector(dataId); } catch(e) {}
         }
         if (el && el.tagName === 'IMG') {
-          // PROTECCIÓN: Si es el logo, no permitir que el JSON lo sobrescriba para evitar bugs
-          if (el.classList.contains('logo')) return;
+          // PROTECCIÓN TOTAL: No permitir que el JSON toque el logo ni la mascota
+          if (el.classList.contains('logo') || el.classList.contains('mascota') || el.closest('.logo-container')) return;
 
           el.src = window.optimizeImageUrl(val.src || val, el.offsetWidth || 800);
           if (val.alt) el.alt = val.alt;
