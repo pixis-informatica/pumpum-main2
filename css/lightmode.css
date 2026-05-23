@@ -903,3 +903,26 @@ div:not(.cart-qty):not(.btn-filtro):not(.main-header):not(.main-header div):not(
     max-width: 380px !important;
     margin: 0 auto !important;
 }
+
+/* --- AJUSTES DE PRODUCTOS MODO OFICINA --- */
+
+/* 1. Borde negro para todos los productos */
+body.light-mode .card,
+body.light-mode .destacados .card {
+    border: 1px solid #000000 !important;
+}
+
+/* 2. Deactivar efecto pulsante (sombra) en general */
+body.light-mode .pulsante2 {
+    animation: none !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important; /* Sombra estática suave */
+}
+
+/* 3. EXCEPCIÓN: Nuevos Ingresos mantiene su efecto original (RGB y Pulso) */
+body.light-mode .nuevos-ingresos .card {
+    border: 2px solid transparent !important; /* Mantiene el borde RGB */
+}
+
+body.light-mode .nuevos-ingresos .card.pulsante2 {
+    animation: pulse 1.5s infinite !important; /* Restaura el pulso */
+}
