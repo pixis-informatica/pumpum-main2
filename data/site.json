@@ -1,0 +1,71 @@
+{
+  "topBannerText": "SERVICIO TECNICO ESPECIALIZADO EN COMPUTACION Y MANTENIMIENTO EN CONSOLAS",
+  "address": "Jujuy 412 Edificio San Antonio 2° piso oficina \"B\"",
+  "phone": "+54 9 3856 97-0135",
+  "email": "pixisinformatica.contacto@gmail.com",
+  "instagram": "https://www.instagram.com/pixisinformatica/",
+  "facebook": "https://www.facebook.com/profile.php?id=100065599325306",
+  "tiktok": "https://www.tiktok.com/@pixis.informatica?is_from_webapp=1&sender_device=pc",
+  "youtube": "https://www.youtube.com/@PIXIS.INFORMATICA",
+  "whatsappLink": "https://wa.me/message/EYUUSVNG5HPNF1",
+  "carouselTop": [
+    {
+      "imgPc": "img/carrusel/banner-kit-ryzen-pc-1779224855793.jpg",
+      "imgMobile": "img/carrusel/banner-kit-ryzen-movil-1779224860684.jpg",
+      "bannerId": "kitryzen"
+    },
+    {
+      "imgPc": "img/carrusel/banner-pc-1779225174059.jpg",
+      "imgMobile": "img/carrusel/banner-pc-movil--1779225178512.jpg",
+      "bannerId": "pccombo"
+    },
+    {
+      "imgPc": "img/carrusel/mini-pc-pc-1779478506841.jpg",
+      "imgMobile": "img/carrusel/mini-pc-mobile-1779478510259.jpg",
+      "bannerId": "notebooks"
+    },
+    {
+      "imgPc": "img/carrusel/rtx-5050-pc-1779478421431.jpg",
+      "imgMobile": "img/carrusel/rtx-5050-mobile-1779478439239.jpg",
+      "bannerId": "rtx5050"
+    },
+    {
+      "imgPc": "img/carrusel/rtx-5060-pc-1779478458454.jpg",
+      "imgMobile": "img/carrusel/rtx-5050-mobile--2--1779478472577.jpg",
+      "bannerId": "rtx5060"
+    },
+    {
+      "imgPc": "img/carrusel/prolongalizador-pc-1779478491716.jpg",
+      "imgMobile": "img/carrusel/prolongalizador-mobile-1779478488253.jpg",
+      "bannerId": "prolongadores"
+    }
+  ],
+  "carouselBottom": [
+    {
+      "imgPc": "img/carrusel/monitor-rapto-pc-1779478620997.jpg",
+      "imgMobile": "img/carrusel/monitor-rapto-mobile-1779478624353.jpg",
+      "bannerId": "monitor"
+    },
+    {
+      "imgPc": "img/carrusel/refrigeracion-pc-1779478633160.jpg",
+      "imgMobile": "img/carrusel/refrigeracion-mobile-1779478636112.jpg",
+      "bannerId": "refrigeracion-raptor"
+    },
+    {
+      "imgPc": "img/carrusel/gabinetes-pc-1779478645436.jpg",
+      "imgMobile": "img/carrusel/gabinetes-mobile-1779478651946.jpg",
+      "bannerId": "gabinetes-raptor"
+    },
+    {
+      "imgPc": "img/carrusel/perifericos-pc-1779479821586.jpg",
+      "imgMobile": "img/carrusel/perifericos-mobile-1779479825495.jpg",
+      "bannerId": "perifericos-raptor"
+    },
+    {
+      "imgPc": "img/carrusel/ssd-hiksemi-pc-1779478675740.jpg",
+      "imgMobile": "img/carrusel/ssd-hiksemi-mobile-1779478679137.jpg",
+      "bannerId": "ssd-hiksemi"
+    }
+  ],
+  "cacheVersion": 1779488760313
+}
