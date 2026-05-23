@@ -915,16 +915,41 @@ function openImageEditor(imgEl) {
 
   window.PixisOverlay.openModal('<span class="modal-icon">🖼️</span> Editar imagen', body, footer);
 
-  // File input → preview
-  document.getElementById('imgFileInput')?.addEventListener('change', function () {
+  // File input → upload al servidor y preview
+  document.getElementById('imgFileInput')?.addEventListener('change', async function () {
     const file = this.files[0];
     if (!file) return;
+
+    // Mostrar preview inmediato en base64 mientras sube
     const reader = new FileReader();
     reader.onload = (e) => {
       document.getElementById('imgPreviewModal').src = e.target.result;
-      document.getElementById('imgUrlInput').value = e.target.result;
     };
     reader.readAsDataURL(file);
+
+    // Subir al servidor para obtener ruta real (no base64)
+    try {
+      window.PixisOverlay.showToast('📤 Subiendo imagen...', 'info', 2000);
+      const ext = file.name.split('.').pop() || 'jpg';
+      const filename = `img-${Date.now()}.${ext}`;
+      const res = await fetch(`/api/upload-image?filename=${encodeURIComponent(filename)}&folder=img/uploads`, {
+        method: 'POST',
+        body: file
+      });
+      const data = await res.json();
+      if (data.ok && data.url) {
+        document.getElementById('imgUrlInput').value = data.url;
+        document.getElementById('imgPreviewModal').src = data.url;
+        window.PixisOverlay.showToast('✅ Imagen subida: ' + data.url, 'success', 3000);
+      } else {
+        window.PixisOverlay.showToast('⚠️ No se pudo subir al servidor. Verifique que el servidor esté corriendo.', 'warning', 4000);
+        // Fallback: dejar el campo vacío para forzar al usuario a usar URL
+        document.getElementById('imgUrlInput').value = '';
+      }
+    } catch (e) {
+      window.PixisOverlay.showToast('⚠️ Error al subir imagen: ' + e.message, 'warning', 4000);
+      document.getElementById('imgUrlInput').value = '';
+    }
   });
 
   // URL preview
