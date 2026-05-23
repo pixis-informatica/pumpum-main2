@@ -4138,7 +4138,7 @@ body.buscando .card {
 
   transition: all .3s ease;
 
-  z-index: 999999;
+  z-index: 2000000;
 }
 
 #cart-toast.show {
