@@ -3352,18 +3352,20 @@ window.goHome = function () {
   const destacados = document.querySelector(".destacados");
   const nuevosIngresos = document.getElementById("nuevosIngresosSection");
 
-  // Limpiar categoría activa al volver a inicio
+  // Limpiar memoria de navegación al volver a inicio a propósito
+  sessionStorage.removeItem('pixisAppState');
   window._categoriaActiva = null;
   actualizarEnlaceActivo();
 
-  // Ocultar catálogo
+  // Ocultar catálogo y resultados
   if (catalogo) catalogo.style.display = "none";
 
-  // Mostrar Portada
-  if (destacados) destacados.style.display = "";
-  if (nuevosIngresos) nuevosIngresos.style.display = "";
-  if (document.getElementById("reelsSection")) document.getElementById("reelsSection").style.display = "";
-  if (document.getElementById("aprendeSection")) document.getElementById("aprendeSection").style.display = "";
+  // Mostrar Portada y Secciones Iniciales
+  if (destacados) destacados.style.display = "block";
+  if (nuevosIngresos) nuevosIngresos.style.display = "block";
+  if (document.getElementById("reelsSection")) document.getElementById("reelsSection").style.display = "block";
+  if (document.getElementById("aprendeSection")) document.getElementById("aprendeSection").style.display = "block";
+
 
   // Limpiar Búsqueda preventivamente sin loop
   // (no se dispara 'input' para evitar que el listener vuelva a programar goHome)
