@@ -2,16 +2,16 @@
   "texts": {
     "texts-1-1776789991272": "RetirÃƒÆ’Ã‚Â¡ gratis",
     "texts-223-1776812544363": "DISCO SSD SATA 480GB 2.5 HIKSEMI para putos",
-    "texts-1-1776812544362": "ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ DESTACADOS ssss ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥",
+    "texts-1-1776812544362": "ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã‚Â¥ DESTACADOS ssss ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã‚Â¥",
     "texts-223-1776815505263": "ssd",
-    "texts-1-1776819158476": "ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ DESTACADOS pixis ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥",
-    "texts-1-1776819326737": "ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ PIXIS ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥",
-    "texts-1-1776819367598": "ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ PIXIS ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥",
+    "texts-1-1776819158476": "ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã‚Â¥ DESTACADOS pixis ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã‚Â¥",
+    "texts-1-1776819326737": "ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã‚Â¥ PIXIS ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã‚Â¥",
+    "texts-1-1776819367598": "ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã‚Â¥ PIXIS ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã‚Â¥",
     "texts-223-1776819457891": "SSD HIKSEMI 480GB",
     "texts-223-1776819501415": "SSD480GB",
-    "texts-1-1776819775212": "ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ DESTACADOS ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥",
+    "texts-1-1776819775212": "ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã‚Â¥ DESTACADOS ÃƒÂ°Ã…Â¸Ã¢â‚¬Â Ã‚Â¥",
     "body#top > section:nth-of-type(3) > h2": {
-      "text": "ðŸ”¥destacadosðŸ”¥",
+      "text": "🔥destacados🔥",
       "style": {
         "width": "355.094px",
         "fontSize": "",
@@ -19,19 +19,6 @@
         "textAlign": "",
         "display": "inline-block",
         "transform": "",
-        "position": "",
-        "zIndex": ""
-      }
-    },
-    "body#top > header > div > div > span": {
-      "text": "PC, hardware y servicio tÃƒÂ©cnicoen Santiago del Estero",
-      "style": {
-        "width": "398.391px",
-        "fontSize": "17px",
-        "lineHeight": "23px",
-        "textAlign": "center",
-        "display": "inline-block",
-        "transform": "translate(1px, 5px)",
         "position": "",
         "zIndex": ""
       }
@@ -57,6 +44,58 @@
         "lineHeight": "",
         "textAlign": "",
         "display": "",
+        "transform": "",
+        "position": "",
+        "zIndex": ""
+      }
+    },
+    "body#top > header > div:nth-of-type(3) > div > div > small": {
+      "text": "Jujuy 412 Edificio San Antonio 2° piso oficina \"B\"",
+      "style": {
+        "width": "",
+        "fontSize": "",
+        "lineHeight": "",
+        "textAlign": "",
+        "display": "",
+        "transform": "translate(-73px, -41px)",
+        "position": "",
+        "zIndex": ""
+      }
+    },
+    "section#reelsSection > div > h2": {
+      "text": "🔥nUESTROS REELS🔥",
+      "style": {
+        "width": "",
+        "fontSize": "",
+        "lineHeight": "",
+        "textAlign": "",
+        "display": "",
+        "transform": "",
+        "position": "",
+        "zIndex": ""
+      }
+    },
+    "body#top > section:nth-of-type(3) > div > div:nth-of-type(2) > b": {
+      "text": "Pagá con tarjeta de crédito",
+      "style": {
+        "width": "",
+        "fontSize": "",
+        "lineHeight": "",
+        "textAlign": "",
+        "display": "",
+        "transform": "",
+        "position": "",
+        "zIndex": ""
+      }
+    },
+    "body#top > header > div > div > span": {
+      "text": "PC, hardware y servicio técnico \n                en Santiago del Estero",
+      "style": {
+        "width": "484.891px",
+        "fontSize": "14.5px",
+        "lineHeight": "36.2px",
+        "textAlign": "",
+        "display": "inline-block",
         "transform": "",
         "position": "",
         "zIndex": ""

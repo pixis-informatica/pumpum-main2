@@ -81,6 +81,7 @@ const PixisEditor = {
       '.ib-text b', '.ib-text span',
       'span.precio', '.open-text',
       '.ubicacion small', '.header-web span',
+      '.linea1', '.servicio-tecnico', '.linea2',
       'footer p', 'footer span', 'footer a',
       '.categorias-titulo'
     ],
@@ -411,9 +412,10 @@ function highlightElements(mode) {
   selectorList.forEach(sel => {
     try {
       document.querySelectorAll(sel).forEach((el, i) => {
-        // No marcar elementos del editor
+        // No marcar elementos del editor ni funcionales del header
         if (el.closest('#pixis-editor-topbar') || el.closest('#pixis-side-panel') ||
-            el.closest('#pixis-element-toolbar') || el.closest('.pixis-modal-overlay')) return;
+            el.closest('#pixis-element-toolbar') || el.closest('.pixis-modal-overlay') ||
+            el.closest('.theme-toggle')) return;
 
         el.classList.add('pixis-editable', cssClass);
         el.setAttribute('data-pixis-type', mode);
@@ -718,8 +720,9 @@ function saveElementStyles(el) {
 
   let updateData;
   if (type === 'texts') {
+    const hasTags = el.innerHTML.includes('<') && el.innerHTML.includes('>');
     updateData = {
-      text: el.textContent.trim(),
+      [hasTags ? 'html' : 'text']: hasTags ? el.innerHTML : el.textContent.trim(),
       style: styles
     };
   } else if (type === 'images') {

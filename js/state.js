@@ -276,8 +276,8 @@ window.PixisState = {
           try { el = document.querySelector(dataId); } catch(e) {}
         }
         if (el) {
-          // PROTECCIÓN TOTAL: Nada dentro del logo debe ser tocado por el JSON (textos o imágenes)
-          if (el.classList.contains('logo') || el.classList.contains('mascota') || el.closest('.logo-container')) return;
+          // Evitar sobrescribir elementos funcionales (como el botón de modo gamer)
+          if (el.closest('.theme-toggle')) return;
 
           if (typeof data === 'object' && data !== null) {
             if (data.text !== undefined) el.textContent = data.text;
